@@ -9,9 +9,8 @@
 
 
 class Machine:
+
     def __init__(self, states):
-        if not states:
-            raise ValueError("The states list must be given.")
         self.states = states
         self.current = self.states[0]
         self.stack_top = ["Z"]

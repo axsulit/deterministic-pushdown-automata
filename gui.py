@@ -3,9 +3,19 @@ from ast import literal_eval
 from tkinter import *
 from classes import State, Machine
 
-states_list = set()
-states_obj_list = set()
-dpda = Machine([()])
+
+def readMachine(path):
+    with open(path, 'r') as fptr:
+        text = fptr.read()
+        lines = text.splitlines()
+        text = "\n".join(line for line in lines if (not line.startswith(';') and not line == ""))
+        lines = text.splitlines()
+        return [literal_eval(strings) for strings in lines]
+
+
+states_list = readMachine("sample.txt")
+states_obj_list = [State(state) for state in states_list]
+dpda = Machine(states_obj_list)
 
 done = False
 err = False
@@ -181,16 +191,7 @@ class GUI:
         if self.input_str.get() == "":
             self.reset.config(state=DISABLED)
         else:
-            global done, input_string, str_len_edge, index, steps, err, curr_state, next_state, char_push, char_pop, states_list, states_obj_list, dpda
-
-            # Get list of states as defined by the given machine
-            states_list = self.get_machine_text()
-
-            # Convert state list to state objects
-            states_obj_list = [State(s) for s in states_list]
-
-            # Create DPDA Machine
-            dpda = Machine(states_obj_list)
+            global done, input_string, str_len_edge, index, steps, err, curr_state, next_state, char_push, char_pop
 
             input_string = self.input_str.get()
             str_len_edge = len(input_string) - 1
@@ -293,7 +294,16 @@ class GUI:
     def freset(self):
         print("resetting")
 
-        global input_string, str_len_edge, index, steps, err, done, dpda
+        global input_string, str_len_edge, index, steps, err, done, states_list, states_obj_list, dpda
+
+        # Get list of states as defined by the given machine
+        states_list = self.get_machine_text()
+
+        # Convert state list to state objects
+        states_obj_list = [State(s) for s in states_list]
+
+        # Create DPDA Machine
+        dpda = Machine(states_obj_list)
 
         err = False
         done = False

@@ -1,10 +1,8 @@
 ; This is a sample file for machine definition.
 ; Each line is a tuple defining a state: label, transitions, final state (boolean)
 ; Final states, accepting or rejecting, should have a 'True' value.
-; Final reject state should be labeled with the first character being 'r' (e.g. r).
 ; Transitions are defined as a tuple: ('<input_symbol>', '<symbol_to_pop>', <state>, '<symbol_to_push>').
 ; First state defined will always be initial state (in this case its 'q0').
-; Endmarkers are {'<','>'} for the left and right ends.
 
 ; This accepts the Language L = { w = {a,b}* | wcw^R }
 

@@ -90,9 +90,9 @@ class GUI:
         self.label.pack()
         self.given_label = Text(self.inputStrFrame, bg="#e0fbfc", font=('Arial', 13), padx=0,
                                 pady=1, wrap=WORD, width=50, height=1)
+        self.given_label.tag_config("center", justify='center')
         self.given_label.insert(END, "N/A")
         self.given_label.config(state=DISABLED)
-        # self.given_label = scrolledtext.ScrolledText(self.inputStrFrame, bg="#e0fbfc", text="N/A", font=('Arial', 13), padx=20, pady=1)
         self.given_label.pack(fill=tkinter.BOTH, expand=True, pady=10, padx=5)
 
         # Current State
@@ -124,11 +124,7 @@ class GUI:
         self.given_label.tag_add("center", "1.0", "end")
         self.given_label.config(state=DISABLED)
 
-    def change_label_text(self, given_label, new_text):
-        """Change the text of the given Label widget."""
-        self.given_label.config(text=new_text)
-
-    def change_character_color(self, given_label, char_index, color):
+    def change_character_color(self, char_index, color):
         """Change the color of a specific character and set all other characters to a different color in the given
         Text widget. """
         self.given_label.config(state=NORMAL)
@@ -136,7 +132,7 @@ class GUI:
         self.given_label.tag_add("colored", f"1.{char_index}")
         self.given_label.config(state=DISABLED)
 
-    def remove_color(self, given_label):
+    def remove_color(self):
         self.given_label.config(state=NORMAL)
         self.given_label.tag_remove("colored", "1.0", "end")
         self.given_label.config(state=DISABLED)
@@ -216,11 +212,11 @@ class GUI:
                         char_pop = transition[1]
                         char_push = transition[3]
 
-                    self.remove_color(self.given_label)
+                    self.remove_color()
 
                     if index < 0:
                         index = len(input_string) + index
-                    self.change_character_color(self.given_label, index, "red")
+                    self.change_character_color(index, "red")
 
                     print(
                         f"Read Character: {char}, Current State: {curr_state_label}, Next State: {next_state}, Push | Pop: {char_push} | {char_pop}")
@@ -294,8 +290,9 @@ class GUI:
     def freset(self):
         print("resetting")
 
-        global input_string, str_len_edge, index, steps, err
+        global input_string, str_len_edge, index, steps, err, done
         err = False
+        done = False
         input_string = self.input_str.get()
         self.change_text(input_string)
         str_len_edge = len(input_string) - 1

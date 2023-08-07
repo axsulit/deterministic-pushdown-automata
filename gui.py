@@ -1,4 +1,7 @@
+import tkinter
 from tkinter import *
+from tkinter import scrolledtext
+
 from classes import State, Machine
 from utilities import get_machine
 
@@ -12,14 +15,13 @@ states_obj_list = [State(s) for s in states_list]
 # Create DPDA Machine
 dpda = Machine(states_obj_list)
 
-steps = 0
 curr_state = set()
 
 # colors: 293241,3d5a80, 98c1d9, e0fbfc
-
+done = False
 err = False
 input_string = ""
-str_len_edge = len(input_string) - 1
+str_len_edge = 0
 index = 0
 steps = 0
 
@@ -41,17 +43,19 @@ class GUI:
         self.programDefFrame = Frame(self.programFrame, bg="#98c1d9")
         self.programDefFrame.pack(side="bottom", pady=(0, 5))
         self.rightFrame = Frame(self.root, bg="#3d5a80")
-        self.rightFrame.pack(side="left", ipady=120, pady=60, ipadx=60)
+        self.rightFrame.pack(side="left")
         self.entryFrame = Frame(self.rightFrame, bg="#98c1d9")
-        self.entryFrame.pack(side="top", pady=10)
+        self.entryFrame.pack(side="top", pady=10, padx=50, fill=tkinter.X)
         self.ctrlsFrame = Frame(self.rightFrame, bg="#98c1d9")
-        self.ctrlsFrame.pack(side="top", pady=10)
+        self.ctrlsFrame.pack(side="top", pady=10, padx=50, fill=tkinter.X)
         self.inputStrFrame = Frame(self.rightFrame, bg="#98c1d9")
-        self.inputStrFrame.pack(side="top", pady=10)
+        self.inputStrFrame.pack(side="top", pady=10, padx=50, fill=tkinter.X)
         self.currStFrame = Frame(self.rightFrame, bg="#98c1d9")
-        self.currStFrame.pack(side="top", pady=10)
+        self.currStFrame.pack(side="top", pady=10, padx=50, fill=tkinter.X)
         self.stepsFrame = Frame(self.rightFrame, bg="#98c1d9")
-        self.stepsFrame.pack(side="top", pady=10)
+        self.stepsFrame.pack(side="top", pady=10, padx=50, fill=tkinter.X)
+        self.stackFrame = Frame(self.rightFrame, bg="#98c1d9")
+        self.stackFrame.pack(side="top", pady=10, padx=50, fill=tkinter.X)
 
         # Machine Program
         self.label = Label(self.programFrame, bg="#98c1d9", text="Machine Program", font=('Arial', 13),
@@ -65,156 +69,249 @@ class GUI:
 
         # Input a String
         self.label = Label(self.entryFrame, bg="#98c1d9", text="Input a String", font=('Arial', 12), pady=2)
-        self.label.pack(ipadx=50)
+        self.label.pack()
         self.input_str = Entry(self.entryFrame, bd=1, width=32, font=('Arial', 9))
-        self.input_str.pack()
+        self.input_str.pack(fill=tkinter.BOTH)
 
         # Controls
         self.label = Label(self.ctrlsFrame, bg="#98c1d9", text="Controls", font=('Arial', 12), pady=2)
-        self.label.pack(ipadx=80)
-        self.run = Button(self.ctrlsFrame, text="Run", font=('Arial', 9), command=self.frun)
-        self.run.pack(side="left", ipadx=9)
-        self.pause = Button(self.ctrlsFrame, text="Pause", font=('Arial', 9), command=self.fpause)
-        self.pause.pack(side="left", ipadx=8)
-        self.step = Button(self.ctrlsFrame, text="Step", font=('Arial', 9), command=self.fstep)
-        self.step.pack(side="left", ipadx=8)
-        self.reset = Button(self.ctrlsFrame, text="Reset", font=('Arial', 9), command=self.freset)
-        self.reset.pack(side="left", ipadx=8)
+        self.label.pack(side="top")
+        self.btnFrame = Frame(self.ctrlsFrame, bg="#98c1d9")
+        self.btnFrame.pack(side="top")
+        self.run = Button(self.btnFrame, text="Run", font=('Arial', 9), command=self.frun, width=7)
+        self.run.pack(side="left", padx=5, pady=5)
+        self.step = Button(self.btnFrame, text="Step", font=('Arial', 9), command=self.fstep, width=7)
+        self.step.pack(side="left", padx=5, pady=5)
+        self.reset = Button(self.btnFrame, text="Reset", font=('Arial', 9), command=self.freset, width=7)
+        self.reset.pack(side="left", padx=5, pady=5)
 
         # Given String
         self.label = Label(self.inputStrFrame, bg="#98c1d9", text="Given String", font=('Arial', 12), pady=2)
-        self.label.pack(ipadx=67)
-        self.label = Label(self.inputStrFrame, bg="#e0fbfc", text="10001", font=('Arial', 13), padx=20, pady=1)
-        self.label.pack(ipadx=70)
+        self.label.pack()
+        self.given_label = Text(self.inputStrFrame, bg="#e0fbfc", font=('Arial', 13), padx=0,
+                                pady=1, wrap=WORD, width=50, height=1)
+        self.given_label.insert(END, "N/A")
+        self.given_label.config(state=DISABLED)
+        # self.given_label = scrolledtext.ScrolledText(self.inputStrFrame, bg="#e0fbfc", text="N/A", font=('Arial', 13), padx=20, pady=1)
+        self.given_label.pack(fill=tkinter.BOTH, expand=True, pady=10, padx=5)
 
         # Current State
         self.currstatelbl = Label(self.currStFrame, bg="#98c1d9", text="Current State", font=('Arial', 12), pady=2)
-        self.currstatelbl.pack(ipadx=63)
+        self.currstatelbl.pack()
         self.currstateval = Label(self.currStFrame, bg="#e0fbfc", text="0", font=('Arial', 13), padx=20, pady=1)
-        self.currstateval.pack(ipadx=88)
+        self.currstateval.pack(fill=tkinter.BOTH)
 
         # Steps
         self.stepslbl = Label(self.stepsFrame, bg="#98c1d9", text="Steps", font=('Arial', 12), pady=2)
-        self.stepslbl.pack(ipadx=90)
+        self.stepslbl.pack()
         self.stepsval = Label(self.stepsFrame, bg="#e0fbfc", text="0", font=('Arial', 13), padx=20, pady=1)
-        self.stepsval.pack(ipadx=87)
+        self.stepsval.pack(fill=tkinter.BOTH)
+
+        # Stack
+        self.stacklbl = Label(self.stackFrame, bg="#98c1d9", text="Stack", font=('Arial', 12), pady=2)
+        self.stacklbl.pack()
+        self.stackval = Label(self.stackFrame, bg="#e0fbfc", text="Z", font=('Arial', 13), padx=20)
+        self.stackval.pack(fill=tkinter.BOTH)
 
         self.root.mainloop()
 
+    def change_text(self, new_text):
+        """Change the text in the given Text widget."""
+        self.given_label.config(state=NORMAL)
+        self.given_label.delete("1.0", END)
+        self.given_label.insert(END, new_text)
+        self.given_label.tag_configure("center", justify='center')
+        self.given_label.tag_add("center", "1.0", "end")
+        self.given_label.config(state=DISABLED)
+
+    def change_label_text(self, given_label, new_text):
+        """Change the text of the given Label widget."""
+        self.given_label.config(text=new_text)
+
+    def change_character_color(self, given_label, char_index, color):
+        """Change the color of a specific character and set all other characters to a different color in the given
+        Text widget. """
+        self.given_label.config(state=NORMAL)
+        self.given_label.tag_configure("colored", foreground=color)
+        self.given_label.tag_add("colored", f"1.{char_index}")
+        self.given_label.config(state=DISABLED)
+
+    def remove_color(self, given_label):
+        self.given_label.config(state=NORMAL)
+        self.given_label.tag_remove("colored", "1.0", "end")
+        self.given_label.config(state=DISABLED)
+
     def frun(self):
         print("running")
+        if self.input_str.get() == "":
+            self.reset.config(state=DISABLED)
+        else:
+            global input_string, str_len_edge, index, steps, err, curr_state
 
-        self.step.config(state=DISABLED)
-        self.run.config(state=DISABLED)
-        self.reset.config(state=DISABLED)
-        self.input_str.config(state=DISABLED)
+            input_string = self.input_str.get()
+            str_len_edge = len(input_string) - 1
 
-        global input_string, str_len_edge, index, steps, err, curr_state
+            curr_state = dpda.current
 
-        input_string = self.input_str.get()
-        str_len_edge = len(input_string) - 1
-        print("Input: ", input_string)
+            self.change_text(input_string)
 
-        curr_state = dpda.current
-
-        while not (dpda.is_final() and index == str_len_edge) and not err:
-            self.fstep()
-            self.root.update_idletasks()
-            self.root.after(100)
-
-        print("done")
-        #
-        self.step.config(state=ACTIVE)
-        self.run.config(state=ACTIVE)
-        self.reset.config(state=ACTIVE)
-        self.input_str.config(state=NORMAL)
-        if dpda.is_final() and index == str_len_edge:
             self.step.config(state=DISABLED)
+            self.reset.config(state=DISABLED)
 
-    def fpause(self):
-        print("pausing")
+            while not (dpda.is_final() and index == str_len_edge) and not err:
+                self.fstep()
+                self.root.update_idletasks()
+                self.root.after(700)
+
+            self.step.config(state=ACTIVE)
+            self.run.config(state=ACTIVE)
+            self.reset.config(state=ACTIVE)
+            self.input_str.config(state=DISABLED)
+            if dpda.is_final() and index == str_len_edge:
+                self.step.config(state=DISABLED)
+                dpda.pop()
+                self.stackval.config(text=' '.join(dpda.stack_top))
 
     def fstep(self):
         print("stepping")
-        global input_string, str_len_edge, index, steps, err, curr_state, next_state, char_push, char_pop
 
-        if dpda.is_final() and index == str_len_edge:
-            self.step.config(state=DISABLED)
+        if self.input_str.get() == "":
+            self.reset.config(state=DISABLED)
+        else:
+            global done, input_string, str_len_edge, index, steps, err, curr_state, next_state, char_push, char_pop
 
-        char = input_string[index]
-        print(char, index, str_len_edge)
+            input_string = self.input_str.get()
+            str_len_edge = len(input_string) - 1
 
-        try:
-            current_state, transition = dpda.read_symbol(char)
-            curr_state_label = current_state.label
+            curr_state = dpda.current
 
-            # moved states
-            if curr_state == current_state:
-                char_pop = current_state.get_transition(char)[1]
-                next_state = current_state.get_transition(char)[2]
-                char_push = current_state.get_transition(char)[3]
+            self.change_text(input_string)
+
+            if dpda.is_final() and index == str_len_edge:
+                self.step.config(state=DISABLED)
+
+            char = input_string[index]
+            print(char, index, str_len_edge)
+
+            if done:
+                print("almost done")
+                # print("curr: ", curr_state.label, "current: ", current_state.label)
+                self.currstateval.config(text=curr_state.label)
+                current_state, transition = dpda.read_symbol('e')
+                dpda.pop()
+                print("previous transition taken is under is done")
             else:
-                next_state = current_state.label
-                char_pop = transition[1]
-                char_push = transition[3]
+                try:
 
-            # remove_color(header_value_text)
-            if index < 0:
-                index = len(input_string) + index
-            # change_character_color(header_value_text, index, "red")
+                    current_state, transition = dpda.read_symbol(char)
+                    curr_state_label = current_state.label
 
-            print(
-                f"Read Character: {char}, Current State: {curr_state_label}, Next State: {next_state}, Push | Pop: {char_push} | {char_pop}")
-            steps += 1
+                    # moved states
+                    if curr_state == current_state:
+                        char_pop = current_state.get_transition(char)[1]
+                        next_state = current_state.get_transition(char)[2]
+                        char_push = current_state.get_transition(char)[3]
+                    else:
+                        next_state = current_state.label
+                        char_pop = transition[1]
+                        char_push = transition[3]
 
-            if char_push == 'e' or char_pop == 'e':
-                print("Current stack: ", end="")
-                dpda.print_Stack()
+                    self.remove_color(self.given_label)
 
-            if char_push != 'e':
-                dpda.push(str(char_push))
-                print("Stack after pushing: ", end="")
-                dpda.print_Stack()
+                    if index < 0:
+                        index = len(input_string) + index
+                    self.change_character_color(self.given_label, index, "red")
 
-            if char_pop != 'e':
-                if dpda.stack_top[-1] == char_pop:
-                    dpda.pop()
-                    print("Stack after popping: ", end="")
-                    dpda.print_Stack()
-                # symbol to pop and stack top are not equal
-                else:
-                    print("halt-reject")
-                    self.currstateval = "halt-reject"
+                    print(
+                        f"Read Character: {char}, Current State: {curr_state_label}, Next State: {next_state}, Push | Pop: {char_push} | {char_pop}")
+                    steps += 1
+                    self.currstateval.config(text=curr_state_label)
+                    self.stepsval.config(text=steps)
+
+                    if char_push == 'e' or char_pop == 'e':
+                        print("Current stack: ", end="")
+                        dpda.print_Stack()
+                        self.stackval.config(text=' '.join(dpda.stack_top))
+
+                    if char_push != 'e':
+                        dpda.push(str(char_push))
+                        print("Stack after pushing: ", end="")
+                        dpda.print_Stack()
+                        self.stackval.config(text=' '.join(dpda.stack_top))
+
+                    if char_pop != 'e':
+                        if dpda.stack_top[-1] == char_pop:
+                            dpda.pop()
+                            print("Stack after popping: ", end="")
+                            dpda.print_Stack()
+                            self.stackval.config(text=' '.join(dpda.stack_top))
+                        # symbol to pop and stack top are not equal
+                        else:
+                            print("halt-reject (symbol to pop and stack top are not equal)")
+                            self.currstateval.config(text="halt-reject")
+                            err = True
+                            self.step.config(state=DISABLED)
+
+                    if not dpda.is_done():
+                        index += 1
+                    else:
+                        done = True
+                        # done=True
+                        # print("curr: ", curr_state.label, "current: ", current_state.label)
+                        # self.currstateval.config(text=curr_state.label)
+                        # current_state, transition = dpda.read_symbol('e')
+                        # dpda.pop()
+                        # done = True
+                        # print("previous transition taken is under is done")
+                    # else:
+                    #     index += 1
+
+                except ValueError:
+                    # Current symbol is invalid
+                    print("halt-reject (Current symbol is invalid)")
+                    self.currstateval.config(text="halt-reject")
                     err = True
                     self.step.config(state=DISABLED)
 
-        except ValueError:
-            # Current symbol is invalid
-            print("halt-reject")
-            self.currstateval = "halt-reject"
-            err = True
-            self.step.config(state=DISABLED)
+            if dpda.is_final() and index == str_len_edge:
+                print("halt-accept")
 
-        if dpda.is_done():
-            current_state = dpda.read_symbol('e')
-        else:
-            index += 1
+                self.currstateval.config(text="halt-accept")
+                self.step.config(state=DISABLED)
 
-        if dpda.is_final() and index == str_len_edge:
-            print("halt-accept")
-            self.currstateval = "halt-accept"
-            self.step.config(state=DISABLED)
+                # dpda.pop()
+                self.stackval.config(text=' '.join(dpda.stack_top))
 
-        if index > str_len_edge:
-            print("halt-reject")
-            self.currstateval = "halt-reject"
-            err = True
-            self.step.config(state=DISABLED)
+            if index > str_len_edge:
+                # Incomplete tape
+                print("halt-reject")
+                self.currstateval.config(text="halt-reject (Incomplete tape)")
+                err = True
+                self.step.config(state=DISABLED)
 
-        print()
+            print()
 
     def freset(self):
         print("resetting")
 
+        global input_string, str_len_edge, index, steps, err
+        err = False
+        input_string = self.input_str.get()
+        self.change_text(input_string)
+        str_len_edge = len(input_string) - 1
+        print("Input: ", input_string)
+        index = 0
+        steps = 0
+        print(self.currstateval.cget("text"))
+        self.currstateval.config(text=0)
+        print(self.currstateval.cget("text"))
+        self.stepsval.config(text=0)
+        self.stackval.config(text="Z")
+        self.run.config(state=ACTIVE)
+        self.step.config(state=ACTIVE)
+        self.input_str.config(state=NORMAL)
+        dpda.reset_machine()
 
-GUI()
+
+if __name__ == '__main__':
+    GUI()

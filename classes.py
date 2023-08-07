@@ -16,6 +16,7 @@ class Machine:
         self.stack_top = ["Z"]
 
     """This read the symbol. """
+
     def read_symbol(self, symbol):
         transition = self.current.get_transition(symbol)
         if transition[0] == "error":
@@ -34,12 +35,12 @@ class Machine:
         return self.current, transition
 
     def push(self, symbol):
-        print("pushing ", symbol)
+        print("Pushing", symbol, end="... \n")
         self.stack_top.append(symbol)
 
     def pop(self):
         if self.stack_top:
-            print("popping ", self.stack_top.pop())
+            print("Popping", self.stack_top.pop(), end="... \n")
 
     def print_Stack(self):
         print(self.stack_top)
@@ -52,6 +53,7 @@ class Machine:
 
     def reset_machine(self):
         self.current = self.states[0]
+        self.stack_top = ["Z"]
 
 
 """
@@ -81,7 +83,7 @@ class State:
             return next(val for val in self.transitions if val[0] == symbol)
         except StopIteration:
             # return a default transition to handle situation where there is no valid transition for the symbol
-            return "No valid transition", symbol
+            return self.label, symbol, self.label, "No valid transition"
 
     def print_state(self):
         print("Label:", self.label)

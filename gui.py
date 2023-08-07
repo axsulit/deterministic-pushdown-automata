@@ -1,3 +1,11 @@
+"""
+    STALGCM S11
+    Deterministic PDA
+    Gon Gon, Zhoe Aeris F.
+    Sulit, Anne Gabrielle M.
+    Torio, Ysobella D.
+"""
+
 import tkinter
 from ast import literal_eval
 from tkinter import *

@@ -1,4 +1,12 @@
 """
+    STALGCM S11
+    Deterministic PDA
+    Gon Gon, Zhoe Aeris F.
+    Sulit, Anne Gabrielle M.
+    Torio, Ysobella D.
+"""
+
+"""
     This class represents the Deterministic PDA Machine.
 
     members:
@@ -70,6 +78,7 @@ class State:
         self.label, self.transitions, self.is_final = state
 
     """identify a valid transition given a symbol."""
+
     def get_transition(self, symbol):
         try:
             return next(val for val in self.transitions if val[0] == symbol)

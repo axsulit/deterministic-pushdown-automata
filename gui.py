@@ -191,7 +191,6 @@ class GUI:
 
             if done:
                 print("almost done")
-                # print("curr: ", curr_state.label, "current: ", current_state.label)
                 self.currstateval.config(text=curr_state.label)
                 current_state, transition = dpda.read_symbol('e')
                 dpda.pop()
@@ -226,20 +225,20 @@ class GUI:
 
                     if char_push == 'e' or char_pop == 'e':
                         print("Current stack: ", end="")
-                        dpda.print_Stack()
+                        dpda.print_stack()
                         self.stackval.config(text=' '.join(dpda.stack_top))
 
                     if char_push != 'e':
                         dpda.push(str(char_push))
                         print("Stack after pushing: ", end="")
-                        dpda.print_Stack()
+                        dpda.print_stack()
                         self.stackval.config(text=' '.join(dpda.stack_top))
 
                     if char_pop != 'e':
                         if dpda.stack_top[-1] == char_pop:
                             dpda.pop()
                             print("Stack after popping: ", end="")
-                            dpda.print_Stack()
+                            dpda.print_stack()
                             self.stackval.config(text=' '.join(dpda.stack_top))
                         # symbol to pop and stack top are not equal
                         else:
@@ -252,15 +251,6 @@ class GUI:
                         index += 1
                     else:
                         done = True
-                        # done=True
-                        # print("curr: ", curr_state.label, "current: ", current_state.label)
-                        # self.currstateval.config(text=curr_state.label)
-                        # current_state, transition = dpda.read_symbol('e')
-                        # dpda.pop()
-                        # done = True
-                        # print("previous transition taken is under is done")
-                    # else:
-                    #     index += 1
 
                 except ValueError:
                     # Current symbol is invalid
@@ -274,14 +264,12 @@ class GUI:
 
                 self.currstateval.config(text="halt-accept")
                 self.step.config(state=DISABLED)
-
-                # dpda.pop()
                 self.stackval.config(text=' '.join(dpda.stack_top))
 
             if index > str_len_edge:
                 # Incomplete tape
                 print("halt-reject")
-                self.currstateval.config(text="halt-reject (Incomplete tape)")
+                self.currstateval.config(text="halt-reject")
                 err = True
                 self.step.config(state=DISABLED)
 

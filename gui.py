@@ -1,18 +1,11 @@
 import tkinter
+from ast import literal_eval
 from tkinter import *
-
 from classes import State, Machine
-from utilities import get_machine
 
-# Get list of states as defined by the given machine
-states_list = get_machine("sample.txt")
-print(states_list)
-
-# Convert state list to state objects
-states_obj_list = [State(s) for s in states_list]
-
-# Create DPDA Machine
-dpda = Machine(states_obj_list)
+states_list = set()
+states_obj_list = set()
+dpda = Machine([()])
 
 done = False
 err = False
@@ -63,6 +56,7 @@ class GUI:
         self.machineprog = Text(self.programDefFrame, font=('Fixedsys', 10), height=27, width=75,
                                 yscrollcommand=self.scrollbar.set)
         self.machineprog.pack()
+        self.display_file("sample.txt")
 
         # Input a String
         self.label = Label(self.entryFrame, bg="#98c1d9", text="Input a String", font=('Arial', 12), pady=2)
@@ -87,8 +81,9 @@ class GUI:
         self.label.pack()
         self.given_label = Text(self.inputStrFrame, bg="#e0fbfc", font=('Arial', 13), padx=0,
                                 pady=1, wrap=WORD, width=50, height=1)
-        self.given_label.tag_config("center", justify='center')
         self.given_label.insert(END, "N/A")
+        self.given_label.tag_config("center", justify='center')
+        self.given_label.tag_add("center", "1.0", "end")
         self.given_label.config(state=DISABLED)
         self.given_label.pack(fill=tkinter.BOTH, expand=True, pady=10, padx=5)
 
@@ -111,6 +106,18 @@ class GUI:
         self.stackval.pack(fill=tkinter.BOTH)
 
         self.root.mainloop()
+
+    def get_machine_text(self):
+        text_content = self.machineprog.get("1.0", END).strip()
+        lines = text_content.splitlines()
+        text_content = "\n".join(line for line in lines if (not line.startswith(';') and not line == ""))
+        lines = text_content.splitlines()
+        return [literal_eval(strings) for strings in lines]
+
+    def display_file(self, path):
+        with open(path, 'r') as fptr:
+            stream = fptr.read()
+            self.machineprog.insert(END, stream)
 
     def change_text(self, new_text):
         """Change the text in the given Text widget."""
@@ -139,7 +146,16 @@ class GUI:
         if self.input_str.get() == "":
             self.reset.config(state=DISABLED)
         else:
-            global input_string, str_len_edge, index, steps, err, curr_state
+            global input_string, str_len_edge, index, steps, err, curr_state, states_list, states_obj_list, dpda
+
+            # Get list of states as defined by the given machine
+            states_list = self.get_machine_text()
+
+            # Convert state list to state objects
+            states_obj_list = [State(s) for s in states_list]
+
+            # Create DPDA Machine
+            dpda = Machine(states_obj_list)
 
             input_string = self.input_str.get()
             str_len_edge = len(input_string) - 1
@@ -156,14 +172,8 @@ class GUI:
                 self.root.update_idletasks()
                 self.root.after(700)
 
-            self.step.config(state=ACTIVE)
-            self.run.config(state=ACTIVE)
             self.reset.config(state=ACTIVE)
             self.input_str.config(state=DISABLED)
-            if dpda.is_final() and index == str_len_edge:
-                self.step.config(state=DISABLED)
-                dpda.pop()
-                self.stackval.config(text=' '.join(dpda.stack_top))
 
     def fstep(self):
         print("stepping")
@@ -171,7 +181,16 @@ class GUI:
         if self.input_str.get() == "":
             self.reset.config(state=DISABLED)
         else:
-            global done, input_string, str_len_edge, index, steps, err, curr_state, next_state, char_push, char_pop
+            global done, input_string, str_len_edge, index, steps, err, curr_state, next_state, char_push, char_pop, states_list, states_obj_list, dpda
+
+            # Get list of states as defined by the given machine
+            states_list = self.get_machine_text()
+
+            # Convert state list to state objects
+            states_obj_list = [State(s) for s in states_list]
+
+            # Create DPDA Machine
+            dpda = Machine(states_obj_list)
 
             input_string = self.input_str.get()
             str_len_edge = len(input_string) - 1
@@ -262,7 +281,7 @@ class GUI:
                 self.step.config(state=DISABLED)
                 self.stackval.config(text=' '.join(dpda.stack_top))
 
-            if index > str_len_edge or len(dpda.stack_top) == 0:
+            elif index > str_len_edge or len(dpda.stack_top) == 0:
                 # Incomplete tape or stack is emptied before string is done being read
                 print("halt-reject")
                 self.currstateval.config(text="halt-reject")
@@ -274,18 +293,16 @@ class GUI:
     def freset(self):
         print("resetting")
 
-        global input_string, str_len_edge, index, steps, err, done
+        global input_string, str_len_edge, index, steps, err, done, dpda
+
         err = False
         done = False
         input_string = self.input_str.get()
         self.change_text(input_string)
         str_len_edge = len(input_string) - 1
-        print("Input: ", input_string)
         index = 0
         steps = 0
-        print(self.currstateval.cget("text"))
         self.currstateval.config(text=0)
-        print(self.currstateval.cget("text"))
         self.stepsval.config(text=0)
         self.stackval.config(text="Z")
         self.run.config(state=ACTIVE)

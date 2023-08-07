@@ -76,4 +76,4 @@ class State:
             return next(val for val in self.transitions if val[0] == symbol)
         except StopIteration:
             # return a default transition to handle situation where there is no valid transition for the symbol
-            return self.label, symbol, self.label, "No valid transition"
+            return self.label, symbol, self.label, 'e'

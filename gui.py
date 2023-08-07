@@ -1,6 +1,5 @@
 import tkinter
 from tkinter import *
-from tkinter import scrolledtext
 
 from classes import State, Machine
 from utilities import get_machine
@@ -15,11 +14,9 @@ states_obj_list = [State(s) for s in states_list]
 # Create DPDA Machine
 dpda = Machine(states_obj_list)
 
-curr_state = set()
-
-# colors: 293241,3d5a80, 98c1d9, e0fbfc
 done = False
 err = False
+curr_state = set()
 input_string = ""
 str_len_edge = 0
 index = 0
@@ -31,7 +28,7 @@ class GUI:
         # Window
         self.root = Tk()
         self.root.title("Deterministic PDA")
-        self.root.resizable(0, 0)
+        self.root.resizable(False, False)
         self.root.geometry("1000x520")
         self.root.config(bg="#3d5a80")
 
@@ -194,7 +191,6 @@ class GUI:
                 self.currstateval.config(text=curr_state.label)
                 current_state, transition = dpda.read_symbol('e')
                 dpda.pop()
-                print("previous transition taken is under is done")
             else:
                 try:
 
@@ -266,8 +262,8 @@ class GUI:
                 self.step.config(state=DISABLED)
                 self.stackval.config(text=' '.join(dpda.stack_top))
 
-            if index > str_len_edge:
-                # Incomplete tape
+            if index > str_len_edge or len(dpda.stack_top) == 0:
+                # Incomplete tape or stack is emptied before string is done being read
                 print("halt-reject")
                 self.currstateval.config(text="halt-reject")
                 err = True
